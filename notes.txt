@@ -1,0 +1,8 @@
+1. we are using webpack as a bundler because we configure it through create-react-app
+
+2. 
+- npm install create-react-app
+- npx create-react-app <app-name>
+
+3. we have configured tailwind for create-react-app refering(https://tailwindcss.com/docs/guides/create-react-app)
+
