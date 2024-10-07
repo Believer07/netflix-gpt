@@ -44,3 +44,6 @@ createBrowserRouter is from react-router-dom
     placeholder="Mobile Number" 
     className="p-3 m-3 w-full bg-[#171716] rounded-lg border-[1px] border-slate-50"
 />}
+
+
+minor change
