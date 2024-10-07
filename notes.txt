@@ -284,3 +284,5 @@ const user = useSelector(store => store.user);
 `
 
 and with this user we will the access to the user slice
+
+minor change
