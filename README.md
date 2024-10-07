@@ -1,7 +1,19 @@
 # Project Starting
 - Create React App
 - Configured TailwindCSS for create react app
-
+- Header
+- Routing of app
+- Logn form
+- Sign Up/Sign in form
+- Form Validation
+- useRef Hook
+- firebase setup
+- deploying our app on firebase
+- create signup user account
+- User Authentication using firebase
+- implement sign in user api
+- created our redux store with userSlice
+- 
 
 # Features
 - Login/Sign Up
