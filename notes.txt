@@ -1,0 +1,49 @@
+1. we are using webpack as a bundler because we configure it through create-react-app
+
+2. 
+- npm install create-react-app
+- npx create-react-app <app-name>
+
+3. we have configured tailwind for create-react-app refering(https://tailwindcss.com/docs/guides/create-react-app)
+
+
+4. after making some basic components with normal div lets setup the routing by installing `react-router-dom` -> `npm i -D react-router-dom`
+
+
+5. so this way we will create the routes then
+const appRouter = createBrowserRouter([
+    {
+        path: "/",
+        element: <Login/>
+    },
+    {
+        path: "/Browse",
+        element: <Browse/>
+    }
+])
+
+createBrowserRouter is from react-router-dom
+
+
+6. then in return statement of body, instead of passing direct components we have to return RouteProvider like `<RouterProvider router={appRouter}/>`
+
+
+7. Read about positioning in html, we have used absolute for header's logo image which will basically overlap with the image of login page
+
+
+8. we gave gradient to the netflix logo
+
+
+9. in login.js file we have made a issigninform state variable bec we want to know the state of form i.e. is it a sign in form or a sign up form
+
+10. see how we made toggle feature on login file
+
+11. see how we have added new input box based on toggle feature in login.js
+{!isSignInForm && <input 
+    type="Mobile Number" 
+    placeholder="Mobile Number" 
+    className="p-3 m-3 w-full bg-[#171716] rounded-lg border-[1px] border-slate-50"
+/>}
+
+
+minor change
