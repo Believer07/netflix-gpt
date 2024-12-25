@@ -3,7 +3,6 @@ import Header from "./Header";
 import {checkValideData} from "../utils/validate";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../utils/firebase.js";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice.js";
 
@@ -12,7 +11,6 @@ const Login = () => {
     // to handle the state of form
     const [isSignInForm, setIsSignInForm] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
-    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const toggleSignInForm = () => {
@@ -52,7 +50,7 @@ const Login = () => {
                     // fixing the bug of updating the photoURL with auth.currentUser not with user(which we get from userCredential.user) because it doesn't have the updated values
                     const {uid, email, displayName, photoURL} = auth.currentUser;
                     dispatch(addUser({uid, email, displayName, photoURL}));
-                    navigate("/browse");
+                    // navigate("/browse");
                 }).catch((error) => {
                     // an error occurred
                     setErrorMessage(error.message);
@@ -73,7 +71,7 @@ const Login = () => {
               // Signed in 
               const user = userCredential.user;
               console.log("sign in",user);
-              navigate("/browse");
+            //   navigate("/browse");
             })
             .catch((error) => {
               const errorCode = error.code;

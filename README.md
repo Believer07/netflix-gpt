@@ -13,7 +13,22 @@
 - User Authentication using firebase
 - implement sign in user api
 - created our redux store with userSlice
-- 
+- Bug fix of not logged in user to not allow to route to browse page and vice cersa
+- unsubscribed to the onauthstatechanged callback(good hygiene practice)
+- get data from tmdb api
+- custom hooks for playing movies
+- update store with movies data
+- planning main and secondary container
+- fetch data for trailer video
+- update the store with updated trailer video
+- embedded the youtube video and make it autoplay and mute
+- Build secondary component
+- Build movie MovieLists
+- build movie card
+- GPT Search feature
+- Created the gpt search bar
+- Multi lingual feature in our app
+- Integrate GPT APIs(get our api key)
 
 # Features
 - Login/Sign Up

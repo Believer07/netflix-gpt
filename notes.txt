@@ -7,6 +7,19 @@
 3. we have configured tailwind for create-react-app refering(https://tailwindcss.com/docs/guides/create-react-app)
 
 
+So our root structure will look like something like
+                                                    App.js
+                                                      |
+                                        Body.js(We will have routes here)
+                                        /                               \
+                                       /                                 \
+                                 login.js                            Browse.js
+                                /        \
+                               /          \
+                            Header.js    bg image, forms
+                            /
+                           /
+                        Netflix logo
 4. after making some basic components with normal div lets setup the routing by installing `react-router-dom` -> `npm i -D react-router-dom`
 
 
@@ -25,7 +38,7 @@ const appRouter = createBrowserRouter([
 createBrowserRouter is from react-router-dom
 
 
-6. then in return statement of body, instead of passing direct components we have to return RouteProvider like `<RouterProvider router={appRouter}/>`
+6. then in return statement of body(where we have written the routes), instead of passing direct components we have to return RouteProvider like `<RouterProvider router={appRouter}/>`
 
 
 7. Read about positioning in html, we have used absolute for header's logo image which will basically overlap with the image of login page
@@ -46,8 +59,33 @@ createBrowserRouter is from react-router-dom
 />}
 
 
-12. Now i want to do the from validation, so one way is to to make hooks for every variable, another way is to pass the reference and we will see that using useRef hook, so what we will do is we will assign the null values to the email and password while declaring the variables then use that reference in our input boxes see login.js file
+12. Now i want to do the form validation, so one way is to to make hooks for every variable, another way is to pass the reference and we will see that using useRef hook, so what we will do is we will assign the null values to the email and password while declaring the variables then use that reference in our input boxes see login.js file
 
+Now we will do the validation here on click of sign in/ sign up form, for that we will write handleButtonClick function which will first validate the email and password, so we will write validation in different file i.e. validate.js file
+Now to do this validation, we need to access the email and password field of login page, to do that we have 2 options first is to bind state variables with the email and password placeholders and as these fields will change we will update the state variables this is the one option, another option is to use the hook called as useRef, which basically passes the reference of these fields
+
+12.1. so how we use useRef, so first we will make, these reference variables and assign their initial values to be none like this- 
+`
+const email = useRef(null);
+const password = useRef(null);
+`
+then we will get their reference by writing this ref to the input boxes like this
+`
+<input 
+    ref={email}
+    type="text" 
+    placeholder="Email Address" 
+    className="p-3 m-3 w-full bg-[#171716] rounded-lg border-[1px] border-slate-50"
+/>
+<input 
+    ref={password}
+    type="password" 
+    placeholder="Password" 
+    className="p-3 m-3 w-full bg-[#171716] rounded-lg border-[1px] border-slate-50"
+/>
+`
+
+Now how to access these email and password inside handleButtonClick function, so for that we will write `email.current.value` and same for password, now to show the error message whatever we get after validation of email and password, for that we will make state variables i.e. errorMessage, and we get an error from email and password we will set it to errorMessage and to show this on ui we will write <p> tag for errorMessage
 
 13. also to test submit form we have to stop the submit button action like this 
 `onSubmit={(e) => {e.preventDefault()}}` so that we prevents the submit action
@@ -72,6 +110,7 @@ Run this command from your app's root directory:
  -> Use an existing project
  -> Select a default Firebase project for this directory: netflixgpt-hh07 (NetflixGpt)
  -> What do you want to use as your public directory? build
+ (this build is chossen bec it's a create react app, for parcel it will be dist folder)
  -> Configure as a single-page app (rewrite all urls to /index.html)? No
  -> Set up automatic builds and deploys with GitHub? No
 
@@ -118,7 +157,7 @@ export default appStore;
 `
 
 
-22. now once we have a store lets create a slice i.e. userSlice.js file
+22. now once we have a store lets create a slice i.e. userSlice.js file inside utils only
 
 `
 import { createSlice } from "@reduxjs/toolkit";
@@ -145,6 +184,7 @@ export default userSlice.reducer;
 so here we will create a user slice with createSlice function of reduxjs/toolkit library, now here name key is the name of that user slice, then there is initialState which is the state when no reducers functions were called, then there is reducers which is basically a dispatch functions which will change the state, so we have wrote 2 dispatch functions i.e. addUser and removeUser
 
 now at last we have exported the actions and userSlice.reducer
+so what happens here is when we call the dispatch func like adduser and updateuser, we pass the payload and we return some data which is treated like we have stored that data in redux store, example when we want to add user using addUser dispatch func we will pass the payload and when we return the data it's like we have changed the state of that slice which was initially null bec of initialState key
 
 23. now we will import this userreducer inside my appStore and provide this userSlice inside my reducer like this 
 `
@@ -153,14 +193,13 @@ reducer: {
 }
 `
 
-24. Now that we have configured our redux store now i have to provide this appStore to my app and we will provide it to the root of my app and it is at app.js and we will do it by wrapping our body inside provider like this
+24. Now that we have configured our redux store now i have to provide this appStore to my app and we will provide it to the root of my app and it is at app.js and we will do it by wrapping our body inside provider like this and our provider will take appStore as an input which we have made already
 `
 <Provider store={appStore}>
     <Body/>
 </Provider>
 `
-
-
+So you will see chrome extension i.e. redux devtools have a look to that
 25. now as soon as our user sign in or sign up we will update the redux store
 
 26. now to add user to our store on sign in/up and remove user from our store on logout we have to dispatch our action that we can write inside createUserWithEmailAndPassword and signInWithEmailAndPassword on success but instead there is a function given by firebase itself we will use that to change our state i.e. onAuthStateChanged which will be called every time user signs in our sign out 
@@ -179,7 +218,7 @@ useEffect(() => {
     }, []);
 `
 
-now here we will dispatch the action to add or remove the user, so for that we will need the dispatch
+now here we will dispatch the action to add or remove the user, so for that we will need the dispatch, whenever we write useDispatch func we will write it at the top
 
 const dispatch = useDispatch();
 
@@ -198,8 +237,9 @@ useEffect(() => {
     });
 }, []);
 `
+this adduser and removeUser comes from utils/userSlice file
 
-27. Now after this when user signs in we want it to redirect to browse page, so for this we will use useNavigate() hook to navigate sign in user to /browse, but this will gives an error
+27. Now after this when user signs in we want it to redirect to browse page, so for this we will use useNavigate() hook to navigate sign in user to /browse, so for that we have useNavigate() hook, but this will gives an error
 
 `
 useEffect(() => {
@@ -285,4 +325,315 @@ const user = useSelector(store => store.user);
 
 and with this user we will the access to the user slice
 
-minor change
+
+there is one more thing that when we sign out still we were seeing that sign out button so that why we wrote {user && input box} with sign out placeholder 
+
+30. so what is happening till now is that when we login using createUserWithEmailAndPassword so it changes the onAuthStateChanged which calls the dispatch function, and till that time we dont have photoURL so it will be better that we dispatch the same action we do in onAuthStateChanged here also, that's why we wrote the same after updateProfile api
+    
+    const {uid, email, displayName, photoURL} = auth.currentUser;
+    dispatch(addUser({uid, email, displayName, photoURL}));
+
+one more thing to note here is that we cant write above as const {uid, email, displayName, photoURL} = user;
+because till now user doesnt have the updated values, so we will take it from auth.currentUser which will have the updated values and the dispatch an action
+
+31. now lets solve this bug, so the issue is if i route to /browse page without login, we are able to do that which is not correct, also another bug is if i'm login and i'm at browse page and still i route to / page it re routes me to login page, but ideally it should keep me at browse page only
+
+lets understand why it's happening, because when we are routing to browse page we are not checking for auth, we are not checking that user is logged in or not, there we are just rendering the page
+
+so to solve this we will use onAuthStateChanged, so if you see body.js
+
+`
+useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+        if(user) {
+            // user is signed in
+            const {uid, email, displayName, photoURL} = user;
+            dispatch(addUser({uid, email, displayName, photoURL}));
+        }else{
+            // user is signed out
+            dispatch(removeUser());
+        }
+    });
+}, []);
+`
+
+here bec of [] this event listener every time my page loads each time it is checking the auth of the user
+
+so the ideal way is to add navigate inside onAuthStateChanged function(which at present is inside Body.js file) i.e. if user is logged in, route him to "/browse" page else "/" login page, but we have seen previously that there is issue, we can't write navigate() here at body.js(read above issue i.e. routing is at body.js level and we can navigate only at child not at body level, means navigate will work at login or browse component or its child component level)
+
+so to solve this i'll shift my useEffect to some component which is always present and i.e. our header component, because header component is always present whether its a login page or it's a browse page, so header.js file seems to be a better option to shift our onAuthStateChanged function, because after shifting it to header.js file we can navigate, because body.js se nhi krr paa rhe the but abb header.js se krr paenge because header ke parent level prr routes likhe hai
+
+BEC REMEBER NAVIGATE SIRF appRouter ke children level prr hi kaam karega, isliye onAuthStateChanged wala useEffect header component ke andar daal diya
+
+we have removed navigate from login.js and several places from header file as well, think about it why i did that
+
+
+32. GOOD HYGIENE PRACTICE: so when our header component unmounts at that we have unsubscribe to the onAuthStateChanged bec jitni baar user ki state change hogi useEffect ke andar wala function chalega, so for that when header compoent unmounts then we have to unsubscribe to that function and how we do that, we do that by returning the function, so if we see firebase document we will get to know that onAuthStateChanged returns a unsubscribe func which we will return
+`see the return statement inside useEffect`
+
+Means ki useEffect in header can load multiple times in single session, toh usse ye hoga ki jitni baar bhi header compoent render hoga utni baar eventlistners attach hoo jaenge usse and onAuthStateChanged chalega, so see jbb tkk mera component wha hai tbb tkk its totally fine to do this, but jbb hamara component unmount hoga then we have to unsubscribe it
+
+Now remember how and where to write when our component unmounts, so wo return krte time function likhte hai
+
+33. constants file hamne nhi banai hai but banana chahiye
+
+
+34. So we are using tmdb api's to fetch the movies list 
+`https://developer.themoviedb.org/reference/movie-now-playing-list`
+and we save the call in constants.js file
+
+and we will call this at my browse page
+
+35. so now after we have written the getNowPlayingMovies function in browse component, we will write it inside useEffect with [], so that whenever this component loads our useEffect calls this func and gets the data but remember we have written this with empty list([]) so that we useEffect calls this function only once, if we have written this useEffect without empty list then there will be a infinite calls to this getNowPlayingMovies func
+
+36. now if you see your console must be printing movie_data twice its because of the index page have </React.StrictMode> which wraps our app component, but this happens only in local not in prod build so its fine if you want to remove it
+
+37. now lets put this data into a slice for that we will create a new slice for that
+
+38. now we have made a slice for movies and in that we have initialized our slice with dict having a null key as nowPlayingMovies and when a dispatch func i.e. addNowPlayingMovies is called we update the state of the slice
+
+now add this slice to our appStore
+
+Now if you see in redux dev tools you will get that you have configured your slice perfectly
+
+
+39. now we will dispatch this action from browse page, using useDispatch hook like this
+
+const dispatch = useDispatch();
+dispatch(addNowPlayingMovies(json.results));
+
+after this you will see that in redux devtools your redux store is getting updated
+
+
+40. now till now our browse page looks like this, which seems to be bit messy, so lets make hook for this for fetching the movies using tmdb apis and updating our store
+
+`
+import { useEffect } from "react";
+import { GET_NOW_PLAYING_MOVIES_URI, API_OPTIONS } from "../utils/constants";
+import Header from "./Header";
+import { useDispatch } from "react-redux";
+import { addNowPlayingMovies } from "../utils/movieSlice";
+
+const Browse = () => {
+    const dispatch = useDispatch();
+    const getNowPlayingMovies = async () => {
+        const data = await fetch(
+            GET_NOW_PLAYING_MOVIES_URI,
+            API_OPTIONS
+        );
+        const json = await data.json();
+        console.log("movies data = ",json.results);
+
+        // dispatch an action
+        dispatch(addNowPlayingMovies(json.results));
+    };
+
+    useEffect(() => {
+        getNowPlayingMovies();
+    }, []);
+
+    return (
+        <div>
+            <Header/>
+        </div>
+    )
+};
+
+export default Browse;
+`
+
+now we will have only rendering login here nothing else than that
+
+41. now to make a hook remeber the file name start with use/**, so we made useNowPlayingMovies.js file
+
+after making a hook, our browse page will look like this
+`
+import useNowPlayingMovies from "../hooks/useNowPlayingMovies";
+import Header from "./Header";
+const Browse = () => {
+    useNowPlayingMovies();
+    return (
+        <div>
+            <Header/>
+        </div>
+    )
+};
+
+export default Browse;
+`
+
+43. PLANNING FOR BROWSE PAGE: now if we see netflix our structure look like this
+`
+MainContainer
+    - VideoBackground
+    - VideoTitle
+SecondaryContainer
+    - MovieList * n
+        - cards * n
+`
+
+44. now in our MainContainer we need to show movie data and we will get it from our store so for that we will use useSelector hook like this
+`const movies = useSelector(store => store.movies?.nowPlayingMovies);`
+
+45. now see we have de constructed the mainMovie and passed the title and overview to the VideoTitle component, see how to pass some variables as args
+
+and see how we took the props as input to VideoTitle component
+
+46. now for the video background we will see that tmdb gives us an video api which gives us plenty of videos among them there is a dict which have a type trailer which we are going to use, we can test using their api documentation
+
+Now to call that api we will need the movie id which we are already getting with our get call of GET_NOW_PLAYING_MOVIES_URI
+
+47. now in our VideoBackground component the trailer have the youtube key through which we can get the trailer
+
+
+48. now see for calling the iframe with youtube link with key, we have to get the key from trailer json, so for that we will make a state variable, this is one way like this
+`
+const [trailerId, setTrailerId] = useState(null);
+and then
+setTrailerId(trailer.key); inside getMoviesVideos function after getting the trailer
+
+then in iframe, write this
+src={"https://www.youtube.com/embed/"+trailerId}
+`
+
+but another way is to use redux store and we do it like this
+
+by putting it inside movieSlice and then dispatching the addTrailerVideo action after getting the trailer data, and then subscribing it using the useSelector hook and then getting the key from the subscribed trailerVideo, also remeber we have written it something like 
+`const trailerVideo = useSelector(store => store.movies?.trailerVideo);`
+
+
+49. I realized one thing that when we pass dispatch function like this 
+`dispatch(addTrailerVideo({trailer}));` then it adds one more key i.e. trailer to the response, but if we pass something like `dispatch(addTrailerVideo(trailer));` without curly brackets then there will be no extra key in the response(see redux dev tools output) you will get what i'm trying to say
+
+
+50. now our VideoBackground component looks very messy so lets make a hook for all the work which is happening here, to make our code cleaner, by this my code becomes more cleaner, easily testable, it solves the problem of `separation of concerns`
+
+51. Remember that w-screen in className is for whole screen
+
+52. Now to set the aspect ratio there is aspect-ratio in className see in iframe in videomainbackground.js file
+
+53. when we overlap 2 cpmponents using the absolute, then yhe below container will not be clickable bec all the clicks on screen will be considered for top(or above) component, so for that we will write `pointer-events-none` to the top components top div like this
+
+`
+<div className="w-screen aspect-video pt-[30%] px-24 absolute pointer-events-none text-white bg-gradient-to-tr from-black">
+    <h1 className="text-6xl font-bold pointer-events-auto">{title}</h1>
+    <p className="py-6 text-lg w-1/4">{overview}</p>
+    <div className="">
+        <button className="bg-gray-500 text-white p-4 px-12 text-xl bg-opacity-50 rounded-lg pointer-events-auto">► Play</button>
+        <button className="mx-2 bg-gray-500 text-white p-4 px-12 text-xl bg-opacity-50 rounded-lg">More Info</button>
+    </div>
+</div>
+`
+
+but this will make the pointer events disable on top container but there could be a possibility that we want some pointer events or clickability on top compoent so for that we have to write pointer-events-auto to thar specific div like we did here at play button
+
+
+54. See in MovieList.js file when we use map we should always have to use key the way we have used it here in MovieCard, also see here how we used the map for looping
+
+
+55. now see in MovieList.js file after only writing flex it looks like
+`
+<div>
+    <div className="flex">
+        <h1>{title}</h1>
+        {movies &&
+            <div className="flex">
+                {movies.map(movie => <MovieCard key={movie.id} posterPath={movie.poster_path}/>)}
+            </div>
+        }
+    </div>
+</div>
+`
+
+so here there are lot of movies so it is going outside of page so we will add scrolling on overflow i.e. overflow-x-scroll
+
+56. see here take title on top we used the z index by using this `relative z-20`
+
+
+57. 15th video ka last wala part dekhna agr samjh naa aaye ki overlap kese kiya SecondaryContainer ko MainContainer prr
+
+
+58. See we have made one more hook for popular movies i.e. usePopularMovies.js file and we have added the reducer for it in movieSlice and we will use this hook inside browse file where we were calling the hook for nowPlayingMovies
+
+
+59. in last episode we start with making a button called as `GPT Search`, now n clicking we should send it to gpt compoent so lets make it
+
+
+60. now after making gptsearch component, render it at browse page, but we want that when someone clicks on gptsearch button only then only render the gptsearch component, so lets store this info inside our redux store and we will do this at header.js level
+
+61. now once we have made the slice for gpt, we have dispatched the action , now read that using useSelector hook from browse component so that when gptsearch button is clicked then only we will render that component
+
+62. see how to write ternary operation in react (see browse.js file)
+
+`
+{showGptSearch ? (
+    <GptSearch/>
+) : (
+    <>
+        <MainContainer/>
+        <SecondaryContainer/>
+    </>
+)
+}
+`
+notice here that in else condition we have to write it inside a fragment(<></>)
+
+63. now gpt component should have search bar, gpt movie suggestion component
+
+64. see how to write grid in css(see gptsearchbar.js file), `grid grid-cols-12`, so by this we mean that we have divided the form in 12 grids and then we will give some grids to input and some grids to the button(by writing col-span-3)
+
+65. see how we make our page multilingual, we made languageConstants file then we gave option in header for those options we made supported_languages constant then we iterate that, then we stored the selected lang in redux inside config slice then we used that in gptsearchbar.js file to render it
+
+
+66. now we made `showGptSearchLangOption` varible to show lang select option only after we click on gptsearch button
+
+67. here button text is changing on the basis of showGptSearchLangOption see in header.js file
+
+68. add open ai api key to constants file
+
+69. `npm install --save openai`
+
+70. when we dont want to handle the event on click of button when value is empty, we use `(e) => e.preventDefault()` see GptSearchBar.js file
+
+71. see in GptSearchBar.js file, how we passed the input text from search to the method using `useRef` hook
+
+72. see how called the gpt api's using the search bar on gpt page, now with the 5 recommendation we will call the tmdb api's to get the data for the movies suggested by gpt api response and also see how we made a query for gpt api's content
+
+===============================================================================================================
+
+73. IMP IMP IMP -> see in GptSearchBar.js file, 
+
+const promiseArray = gptMovies.map(movie => searchMovieTmdb(movie));
+
+here in promiseArray we will get 5 promises because `searchMovieTmdb` function is an async func, because map will not wait for promise to be resolved, it will call the five functions imediately, so that's why we will promises in return
+
+now how to resolve all the promise at once, so for that there is a function i.e. Promise.all() which will take array of promises
+
+const tmdbResults = await Promise.all(promiseArray);
+
+now after this if you search something you will see that because of map function there must be 5 seperate calls in network call
+
+===============================================================================================================
+
+74. Now once we got all the movies, push them to the store
+
+75. Now after we get tmdbResults, we will dispatch an action to store these data in to gptMovies state of gptSlice
+
+76. see in gptsearchbar.js file we have dispatch an action where we will pass multiple args and see how we are going to add multiple data using same dispatch function
+
+77. we have introduced the env and we will write it in .gitignore file
+
+78. MEMOIZATION CONCEPT :- 
+
+first understand the problem before understanding the concept of MEMOIZATION, so see if i go to gpt search page and come back again to home page we will see that again my app is calling the api's but when already data is there in redux store why to make calls again, so refetch the data again is not making sense
+
+so for this see we made changes to useNowPlayingMovies.js file which is a hook,
+so we introduced one variable i.e. nowPlayingMovies which subscribes to the store, same we did in usepopularMovies.js file and useMovieTrailer.js
+
+80. now see till now we have made a web app, now to make it more responsive we have to make it compatible with mobile also
+
+81. so there are 3 types of devices i.e. mobile, tablets, desktop
+
+so if you write like this "bg-black sm:bg-blue-900 md:bg-green-900", this means by default the css is bg-black which is for mobile devices then for smaller devices like tablet it will be blue and for big devices like desktop it will be green
+
+so md means greater than medium devices and sm means greater than smaller devices
